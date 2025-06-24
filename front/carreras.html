@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Carreras</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body id="carreras-page">
+<header class="navbar">
+  <div class="nav-container">
+    <div class="logo">Instituto Superior de Formación Docente</div>
+    <nav class="nav-links">
+      <a href="inicio.html">Inicio</a>
+      <a href="index.html">Estudiantes</a>
+      <a href="carreras.html">Carreras</a>
+      <a href="categorias.html">Categorías</a>
+    </nav>
+  </div>
+</header>
+    <div class="container">
+        <div class="image-section">
+            <div class="image-content">
+                <h2>Registro de Carreras</h2>
+                <p>Gestiona las carreras académicas disponibles en nuestra institución</p>
+            </div>
+        </div>
+        
+         <div class="form-section">
+         <form id="careerForm">
+            <div class="form-header">
+                <h1>Sistema de Gestión de Carreras</h1>
+                <p>Administra el registro de carreras de manera sencilla</p>
+            </div>
+
+            <div class="form-container">
+                <div class="form-group">
+                    <h2>Nombre de la carrera</h2>
+                    <input type="text" id="careerName" placeholder="Nombre completo (ej. Ingeniería en Sistemas)">
+                </div>
+                <div class="form-group">
+                    <h2>Tipo de carrera</h2>
+                    <select id="careerType">
+                        <option value="">Seleccione un tipo</option>
+                        <option value="Tecnicatura">Tecnicatura</option>
+                        <option value="Licenciatura">Licenciatura</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <h2>Categoría académica</h2>
+                    <select id="careerCategory">
+                        <option value="">Seleccione una categoría</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-block">Registrar Carrera</button>
+                    <div class="result-container" id="registerResult"></div>
+                    <div class="form-group">
+                        </div>
+
+     <div class="form-group" id="getById">
+        <h2>Buscar carrera por ID</h2>
+        <input type="number" id="careerId" placeholder="ID de la carrera">
+        <button class="btn btn-block" onclick="event.preventDefault(); getCareerById()">Buscar</button>
+            <div class="result-container" id="getCareerResult"></div>
+            </div>
+
+        <h2>Eliminar carrera por ID</h2>
+          <input type="number" id="deleteCareerId" placeholder="ID de la carrera">
+          <button class="btn btn-block" onclick="deleteCareer()">Eliminar</button>
+          <div class="result-container" id="deleteResult"></div>
+        </div>
+        <div class="table-responsive">
+            <table class="careers-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Tipo</th>
+                        <th>Categoría</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="careersTableBody"></tbody>
+            </table>
+        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   <script src="app.js" defer></script>
+</body>
+</html>

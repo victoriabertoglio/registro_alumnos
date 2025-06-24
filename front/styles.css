@@ -1,0 +1,529 @@
+:root {
+    --primary-color: #4361ee;
+    --primary-dark: #3a56d4;
+    --secondary-color: #3f37c9;
+    --light-gray: #f8f9fa;
+    --dark-gray: #343a40;
+    --white: #ffffff;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --transition: all 0.3s ease;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: var(--light-gray);
+    color: var(--primary-color); /* ← este es el color del texto por defecto */
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+.menu-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    z-index: 100;
+    transition: var(--transition);
+}
+
+.menu-button:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.image-section {
+    flex: 1;
+    background-image: url('estudiantess.jpg');
+    background-size: 165% auto;
+    background-position: center 35%;
+    background-repeat: no-repeat;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    padding: 2rem;
+}
+
+.image-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(5px);
+}
+
+.image-content {
+    position: relative;
+    z-index: 1;
+    color: var(--white);
+}
+
+.image-content h2 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.image-content p {
+    font-size: 1.1rem;
+    max-width: 80%;
+}
+
+.form-section {
+    flex: 1;
+    width: 50%;
+    padding: 4rem 3rem;
+    background-color: var(--white);
+    overflow-y: auto;
+}
+
+.form-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.form-header h1 {
+    font-size: 2.2rem;
+    color: var(--primary-color);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.form-header p {
+    color: #666;
+    font-size: 1rem;
+}
+
+.form-container {
+    width: 100%;
+}
+
+.form-group {
+    margin-bottom: 1.8rem;
+}
+
+.form-group h2 {
+    font-size: 1.4rem;
+    color: (#4361ee);
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+input {
+    width: 100%;
+    padding: 12px 15px;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    transition: var(--transition);
+    margin-bottom: 10px;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+}
+
+.btn {
+    display: inline-block;
+    padding: 12px 28px;
+    background-color: var(--primary-color);
+    color: var(--white);
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    text-align: center;
+    width: auto;
+}
+
+.btn:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+.result-container {
+  background-color: transparent;
+  border: none;
+  border-left: none; /* ← importante */
+  box-shadow: none;
+  margin: 10px;
+  padding: 0;
+}
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.85); /* Blanco semitransparente */
+    backdrop-filter: blur(8px); /* Blur de fondo */
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+  }
+
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .logo {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .nav-links a {
+    margin-left: 1.5rem;
+    text-decoration: none;
+    color: var(--dark-gray);
+    font-weight: 500;
+    font-size: 1rem;
+    transition: var(--transition);
+    font-family: 'Poppins', sans-serif;
+  }
+
+  .nav-links a:hover {
+    color: var(--primary-color);
+  }
+
+  @media (max-width: 768px) {
+    .nav-container {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .nav-links {
+      margin-top: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .nav-links a {
+      margin-left: 0;
+    }
+  }
+  .content-wrapper {
+  margin-top: 45px; /* o ajustá según la altura real de tu navbar */
+}
+.content-card h2 {
+  color: #4361ee;
+    }
+    .content-card h1 {
+  color: #4361ee;
+    }
+.inicio-page body,
+.inicio-page html {
+  height: 100%;
+  margin: 0;
+}
+
+.inicio-page .background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: url('estudiantess.jpg') no-repeat center center;
+  background-size: cover;
+  filter: blur(6px);
+  z-index: -1;
+}
+
+.inicio-page .overlay {
+  background-color: rgba(0, 0, 0, 0.3);
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  z-index: -1;
+}
+
+.inicio-page .content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: start;
+  padding: 4rem 2rem;
+  min-height: 100vh;
+  margin-top: 45px;
+}
+
+.inicio-page .content-card {
+  background-color: white;
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 2.5rem 3rem;
+  max-width: 900px;
+  width: 100%;
+  margin-bottom: 2rem;
+}
+
+.inicio-page .content-card h1 {
+  color: #4361ee;
+  margin-bottom: 1rem;
+}
+
+.inicio-page .content-card h2 {
+  color: #4361ee;
+}
+
+.inicio-page .content-card p {
+  font-size: 1.1rem;
+  color: #4361ee;
+}
+
+.inicio-page .news-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.inicio-page .news-item {
+  background: var(--white);
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+}
+
+.inicio-page .news-item h3 {
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+}
+
+.inicio-page .menu-button {
+  top: 20px;
+}
+
+.inicio-page .menu-links {
+  display: flex;
+  gap: 10px;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 2;
+}
+/* Estilos para la tabla */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto; /* Para hacerla responsive */
+  margin-top: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra opcional */
+}
+
+.careers-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.careers-table th, 
+.careers-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.careers-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+}
+
+.careers-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Estilos para botones de acciones */
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-info {
+  background-color: #17a2b8;
+  color: white;
+  border: none;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+}
+.categories-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+.categories-table th, 
+.categories-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.categories-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+}
+
+.students-table tr:hover {
+  background-color: #f5f5f5;
+}
+
+.students-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+ 
+.students-table th,
+.students-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.students-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Estilos para los selects desplegables */
+select {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 8px 0 20px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f8f8f8;
+  font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+select:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+/* Mejorar el espaciado en el formulario de estudiantes */
+#registerName {
+  margin-bottom: 20px; /* Más espacio entre campos */
+}
+
+/* Estilo específico para el select de carrera en estudiantes */
+#registerCareer {
+  margin-bottom: 25px; /* Más espacio antes del botón */
+}
+
+/* Ajustar el botón de registrar */
+.btn-block {
+  margin-top: 10px; /* Espacio adicional arriba del botón */
+  margin-bottom: 20px; /* Espacio adicional debajo del botón */
+}
+
+.info-card {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 22px;
+  margin: 20px 0;
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.15);
+  border-left: 5px solid var(--primary-color);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  font-family: 'Poppins', sans-serif;
+  border: 1px solid rgba(67, 97, 238, 0.1);
+}
+
+.info-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(67, 97, 238, 0.2);
+  border-left: 5px solid var(--primary-dark);
+}
+
+.info-card-title {
+  color: var(--primary-color);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(67, 97, 238, 0.1);
+  display: flex;
+  align-items: center;
+}
+
+.info-card-title::before {
+  content: "";
+  display: inline-block;
+  width: 8px;
+  height: 22px;
+  background-color: var(--primary-color);
+  margin-right: 12px;
+  border-radius: 4px;
+}
+
+.info-item {
+  display: flex;
+  margin-bottom: 12px;
+  align-items: flex-start;
+}
+
+.info-item strong {
+  min-width: 130px;
+  color: var(--primary-color);
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+.info-item span {
+  color: #4361ee;
+  font-weight: 400;
+  flex: 1;
+  padding-left: 10px;
+}

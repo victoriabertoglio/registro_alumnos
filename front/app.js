@@ -39,6 +39,21 @@ async function deleteStudentService(id) {
     return response.json();
 }
 
+// función para traer esudiantes por carrera así puede cargarse la tabla. Utiliza el método GET y le pide
+// a la API los estudiantes
+async function getStudentsByCareerService(careerName) {
+    const response = await fetch(`${API_STUDENT_URL}?career=${encodeURIComponent(careerName)}`, {
+        method: "GET",
+        headers
+    });
+
+    if (!response.ok) {
+        throw new Error("No se pudieron obtener los estudiantes por carrera");
+    }
+
+    return response.json();
+}
+
 // Función para registrar estudiante: mediante los id's que están en el formulario html (registerName y registerCareer)
 // se registran nombre y carrera con la función registerStudent la cual es llamada en el botón del html
 // luego, si ambos campos están completos la función espera a registerStudentService
@@ -91,14 +106,13 @@ async function registerStudent() {
 // para traer las carreras cargadas en la base, en el caso de que algo falle se ejecuta el catch y se envía
 // el feedback al usuario para que sepa que no se cargaron las carreras.
 async function populateCareerDropdown() {
+    const select = document.getElementById('registerCareer');
+    if (!select) return; // 🚨 Previene el error en páginas donde no existe
+
     try {
         const careers = await getAllCareersService();
-        const select = document.getElementById('registerCareer');
 
-        // Limpiar opciones previas
         select.innerHTML = '<option value="">Seleccione una carrera</option>';
-
-        // Agregar nuevas opciones
         careers.forEach(career => {
             const option = document.createElement('option');
             option.value = career.name;
@@ -331,20 +345,21 @@ async function registerCareer() {
             throw new Error(result.error);
         }
 
-        // Guardar datos extendidos en localStorage
+        // Guardar datos extendidos en localStorage usando el ID de la API
         const extraCareers = JSON.parse(localStorage.getItem('extraCareers') || '[]');
         
-        // Eliminar entrada existente si hay duplicados
-        const existingIndex = extraCareers.findIndex(e => e.name === name);
+        // Eliminar entrada existente si hay duplicados (por nombre)
+        const existingIndex = extraCareers.findIndex(e => e.name.toLowerCase() === name.toLowerCase());
         if (existingIndex !== -1) {
             extraCareers.splice(existingIndex, 1);
         }
         
+        // Usar siempre el ID de la API para consistencia
         extraCareers.push({ 
+            id: result.career.id, // Usar el ID de la respuesta de la API
             name, 
             type, 
-            category,
-            id: result.id || Date.now() // Guardar también el ID si está disponible
+            category
         });
         
         localStorage.setItem('extraCareers', JSON.stringify(extraCareers));
@@ -489,196 +504,58 @@ async function deleteCareer() {
 // una lista con los datos de la carrera
 async function loadCareersTable() {
     try {
-        const careers = await getAllCareersService();
-        const extraCareers = JSON.parse(localStorage.getItem('extraCareers') || '[]');
+        // Mostrar loader
         const tbody = document.getElementById('careersTableBody');
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center">Cargando...</td></tr>';
+
+        // Obtener datos en paralelo
+        const [careers, extraCareers] = await Promise.all([
+            getAllCareersService(),
+            JSON.parse(localStorage.getItem('extraCareers')) || '[]'
+        ]);
+
+        // Limpiar tabla
         tbody.innerHTML = '';
 
-        careers.forEach(career => {
-            const extra = extraCareers.find(e => e.name === career.name);
-            const type = extra?.type || 'N/A';
-            const category = extra?.category || 'N/A';
+        if (careers.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" class="text-center">No hay carreras registradas</td></tr>';
+            return;
+        }
 
+        // Llenar tabla
+        careers.forEach(career => {
+            // Buscar datos extendidos por ID primero, luego por nombre como fallback
+            let extraData = extraCareers.find(e => e.id === career.id);
+            if (!extraData) {
+                extraData = extraCareers.find(e => e.name.toLowerCase() === career.name.toLowerCase()) || {};
+            }
+            
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${career.id}</td>
                 <td>${career.name}</td>
-                <td>${type}</td>
-                <td>${category}</td>
-                <td>
-                    <button class="btn btn-sm btn-danger" onclick="deleteCareerById(${career.id})">Eliminar</button>
+                <td>${extraData.type || 'N/A'}</td>
+                <td>${extraData.category || 'N/A'}</td>
+                <td class="actions">
+                    <button class="btn btn-sm btn-danger" onclick="deleteCareerById(${career.id})">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
                 </td>
             `;
             tbody.appendChild(row);
         });
+
     } catch (error) {
-        console.error("Error al cargar carreras:", error);
+        console.error("Error cargando carreras:", error);
+        const tbody = document.getElementById('careersTableBody');
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="text-center error">
+                    Error al cargar las carreras. Intente recargar la página.
+                </td>
+            </tr>
+        `;
         Swal.fire("Error", "No se pudieron cargar las carreras", "error");
-    }
-}
-
-// función para eliminar carrera desde la tabla, recién me doy cuenta que no llamé a ningún servicio
-// si no que hace fetch con la API directamente
-async function deleteCareerById(id) {
-    try {
-        const response = await fetch(`${API_CAREERS_URL}/${id}`, {
-            method: "DELETE",
-            headers
-        });
-        const result = await response.json();
-        
-        if (result.error) {
-            Swal.fire("Error", result.error, "error");
-        } else {
-            Swal.fire("Éxito", "Carrera eliminada", "success");
-            loadCareersTable();
-        }
-    } catch (error) {
-        console.error("Error al eliminar:", error);
-        Swal.fire("Error", "No se pudo eliminar", "error");
-    }
-}
-
-// agrega funcionalidad al botón y carga la tabla de carreras
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelector('form').addEventListener('submit', (e) => {
-         e.preventDefault();
-         registerCareer();
-     });
-    
-    document.querySelector('#deleteId').nextElementSibling.querySelector('button').addEventListener('click', deleteCareer);
-    
-    loadCareersTable();
-});
-
-// servicio para hacer post de la carrera en la api
-async function registerCategoryService(name) {
-    const response = await fetch(API_CATEGORIES_URL, {
-        method: "POST",
-        headers,
-        body: JSON.stringify({ name })
-    });
-
-    const data = await response.json();
-    
-    // Manejo especial para la respuesta del backend actual
-    if (response.status === 409) { // Conflicto (categoría ya existe)
-        throw new Error(data.error);
-    }
-    
-    if (!response.ok) { // Otros errores
-        throw new Error('Error al registrar categoría');
-    }
-    
-    // Éxito - forzar estructura esperada por el frontend
-    return {
-        id: data.category?.id || Date.now(), // Si no hay ID, usamos uno temporal
-        name: data.category?.name || name,
-        message: data.message
-    };
-}
-
-// servicio para traer la categoría de la api con id
-async function getCategoryByIdService(id) {
-    const response = await fetch(`${API_CATEGORIES_URL}/${id}`, {
-        method: "GET",
-        headers
-    });
-    return response.json();
-}
-
-// servicio para traer todas las categorías
-async function getAllCategoriesService() {
-    const response = await fetch(API_CATEGORIES_URL, {
-        method: "GET",
-        headers
-    });
-    return response.json();
-}
-
-// servicio para eliminar la categoría por id
-async function deleteCategoryService(id) {
-    const response = await fetch(`${API_CATEGORIES_URL}/${id}`, {
-        method: "DELETE",
-        headers
-    });
-    return response.json();
-}
-
-// se registra la categoría con categoryName (tiene la opción de que solo se añadan letras, si no
-// muestra error)
-async function registerCategory(event) {
-    event.preventDefault();
-    
-    const nameInput = document.getElementById('categoryName');
-    const name = nameInput.value.trim();
-
-    if (!name) {
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Por favor ingrese el nombre de la categoría"
-        });
-        return;
-    }
-
-    // Validación para solo letras y espacios
-    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(name)) {
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "Por favor ingrese solo letras en el nombre de la categoría"
-        });
-        return;
-    }
-
-    try {
-        // Mostrar loader
-        Swal.fire({
-            title: 'Registrando...',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        // Hacer la petición
-        const response = await fetch(API_CATEGORIES_URL, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${API_KEY}`
-            },
-            body: JSON.stringify({ name })
-        });
-
-        const data = await response.json();
-
-        // Cerrar loader
-        Swal.close();
-
-        if (!response.ok) {
-            // Mostrar error específico del backend
-            throw new Error(data.error || 'Error al registrar categoría');
-        }
-
-        // Mostrar éxito con mensaje del backend
-        Swal.fire({
-            icon: "success",
-            title: "Éxito",
-            text: data.message || "Categoría registrada correctamente"
-        });
-
-        // Limpiar y actualizar
-        nameInput.value = '';
-        loadCategoriesTable();
-
-    } catch (error) {
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: error.message
-        });
     }
 }
 
@@ -818,27 +695,32 @@ async function loadCategoriesTable() {
 // llama al servicio para traer todas las categorías de la base
 async function populateCategoryDropdown() {
     try {
-        const categories = await getAllCategoriesService();
         const select = document.getElementById('careerCategory');
+        if (!select) return;
 
-        // Limpiar opciones previas
+        // Mostrar estado de carga
+        select.innerHTML = '<option value="">Cargando categorías...</option>';
+
+        // Obtener categorías
+        const categories = await getAllCategoriesService();
+
+        // Limpiar y poblar el dropdown
         select.innerHTML = '<option value="">Seleccione una categoría</option>';
-
-        // Agregar nuevas opciones
+        
         categories.forEach(category => {
             const option = document.createElement('option');
-            option.value = category.name; // o category.id si usás ID en el backend
+            option.value = category.name;
             option.textContent = category.name;
             select.appendChild(option);
         });
 
     } catch (error) {
-        console.error("Error al cargar categorías:", error);
-        Swal.fire({
-            icon: "error",
-            title: "Error",
-            text: "No se pudieron cargar las categorías"
-        });
+        console.error("Error cargando categorías:", error);
+        const select = document.getElementById('careerCategory');
+        if (select) {
+            select.innerHTML = '<option value="">Error al cargar categorías</option>';
+        }
+        Swal.fire("Error", "No se pudieron cargar las categorías", "error");
     }
 }
 
@@ -878,13 +760,13 @@ async function loadStudentsTable() {
             students.forEach(student => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${student.id}</td>
-                    <td>${student.name}</td>
-                    <td>${student.career}</td>
-                    <td>
+                <td>${student.id}</td>
+                <td>${student.name}</td>
+                <td>${student.career}</td>
+                <td>
                     <button class="btn btn-sm btn-danger" onclick="deleteStudentById(${student.id})">Eliminar</button>
-                    </td>
-                `;
+                </td>
+            `;            
                 tbody.appendChild(row);
             });
         }
@@ -894,29 +776,106 @@ async function loadStudentsTable() {
     }
 }
 
-// esto es para cargar las tablas según su respectiva página
+//función para editar estudiante: para que funcione sin modificar la API, se elimina el estudiante viejo
+// y se guarda el nuevo con los datos modificados
+async function editStudent(id) {
+    try {
+        const student = await getStudentByIdService(id);
+        const allCareers = await getAllCareersService();
+
+        if (!student || !student.id) {
+            return Swal.fire("Error", "Estudiante no encontrado", "error");
+        }
+
+        // Generar opciones del select
+        const careerOptions = allCareers.map(c => `
+            <option value="${c.name}" ${c.name === student.career ? 'selected' : ''}>${c.name}</option>
+        `).join('');
+
+        // Tomar el template desde el HTML
+        const template = document.getElementById('editStudentTemplate');
+        const clonedHtml = template.innerHTML;
+
+        // Mostrar modal
+        const { value: formValues } = await Swal.fire({
+            title: 'Editar Estudiante',
+            html: clonedHtml,
+            customClass: {
+                popup: 'swal2-custom-modal'
+            },
+            showCloseButton: false,
+            showCancelButton: true,
+            confirmButtonText: 'Guardar',
+            cancelButtonText: 'Cancelar',
+            focusConfirm: false,
+            didOpen: () => {
+                document.getElementById('swalName').value = student.name;
+                const select = document.getElementById('swalCareer');
+                select.innerHTML = careerOptions;
+            },
+            preConfirm: () => {
+                const name = document.getElementById('swalName').value.trim();
+                const career = document.getElementById('swalCareer').value;
+                if (!name || !career) {
+                    Swal.showValidationMessage('Todos los campos son obligatorios');
+                    return false;
+                }
+                return { name, career };
+            }
+        });
+
+        if (!formValues) return;
+
+        // Simular edición: eliminar y volver a registrar
+        await deleteStudentService(id);
+        await registerStudentService(formValues.name, formValues.career);
+
+        Swal.fire("Éxito", "Estudiante editado correctamente", "success");
+        loadStudentsTable();
+
+    } catch (error) {
+        console.error("Error al editar estudiante:", error);
+        Swal.fire("Error", "No se pudo editar el estudiante", "error");
+    }
+}
+
+
+// esto es para cargar las tablas según su respectiva página, "addEventListener" lo que hace es "escuchar"
+// a que página entra el usuario, según a cual entre con getElemtById trae el formulario y los datos
+// corespondientes. En esta parte también se populan los seleccionables de carreras y estudiantes.
 document.addEventListener('DOMContentLoaded', () => {
-    
-    if (window.location.pathname.includes('carreras.html')) {
+    const path = window.location.pathname;
+
+    // Página de carreras
+    if (path.includes('carreras.html')) {
+        const form = document.getElementById('careerForm');
+        if (form) {
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                registerCareer();
+            });
+        }
         loadCareersTable();
         populateCategoryDropdown();
     }
 
-    if (window.location.pathname.includes('categorias.html')) {
+    // Página de categorías
+    if (path.includes('categorias.html')) {
         loadCategoriesTable();
+
+        const categoryForm = document.getElementById('categoryForm');
+        if (categoryForm) {
+            categoryForm.addEventListener('submit', registerCategory);
+        }
     }
 
-    if (window.location.pathname.includes('index.html')) {
+    // Página de estudiantes
+    if (path.includes('index.html')) {
         loadStudentsTable();
         populateCareerDropdown();
     }
-
-    
-    const categoryForm = document.getElementById('categoryForm');
-    if (categoryForm) {
-        categoryForm.addEventListener('submit', registerCategory);
-    }
 });
+
 
 // Conclusión: Los servicios sirven para hacer el fetch (la petición) a la API usando metodos: post (guardar
 // get (traer) y delete (borrar)

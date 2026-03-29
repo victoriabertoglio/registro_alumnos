@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "id": 2,
+    "name": "lula",
+    "career": "Ciencia de datos"
+  },
+  {
+    "id": 4,
+    "name": "pepe",
+    "career": "Ciencia de datos"
+  }
+]

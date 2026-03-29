@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Categorías</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles.css">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.22.0/dist/sweetalert2.min.css" rel="stylesheet">
+</head>
+<body class="categories-page">
+    <header class="navbar">
+        <div class="nav-container">
+            <div class="logo">Instituto Superior de Formación Docente</div>
+            <nav class="nav-links">
+                <a href="inicio.html">Inicio</a>
+                <a href="index.html">Estudiantes</a>
+                <a href="carreras.html">Carreras</a>
+                <a href="categorias.html">Categorías</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="image-section">
+            <div class="image-content">
+                <h2>Registro de Categorías</h2>
+                <p>Gestiona las categorías académicas disponibles en nuestra institución</p>
+            </div>
+        </div>
+        
+        <div class="form-section">
+            <div class="form-header">
+                <h1>Sistema de Gestión de Categorías</h1>
+                <p>Administra el registro de categorías de manera sencilla</p>
+            </div>
+            
+            <div class="form-container">
+                <form id="categoryForm">
+                     <div class="form-group">
+                        <h2>Nombre de la categoría</h2>
+                        <input type="text" id="categoryName" placeholder="Nombre completo (ej. Ciencias Exactas)">
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-block">Registrar Categoría</button>
+                        <div class="result-container" id="registerResult"></div>
+                    </div>
+                </form>
+                <div class="form-group">
+                    <h2>Buscar categoría por ID</h2>
+                    <input type="number" id="searchCategoryIdInput" placeholder="ID de la categoría">
+                    <button class="btn btn-block" onclick="getCategoryById()">Buscar</button>
+                    <div class="result-container" id="categoryResult"></div>
+                  </div>
+                <div class="form-group">
+                    <h2>Eliminar categoría por ID</h2>
+                    <input type="number" id="deleteCategoryIdInput" placeholder="ID de la categoría">
+                    <button class="btn btn-block" onclick="deleteCategoryById(document.getElementById('deleteCategoryIdInput').value)">Eliminar</button>
+                    <div class="result-container" id="deleteCategory"></div>
+                </div>
+                <div class="table-responsive">
+                    <table class="categories-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoriesTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./app.js"></script>
+</body>
+</html>
